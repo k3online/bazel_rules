@@ -1,0 +1,1 @@
+pkg_jar rule can be used to embed multiple jars into single jar file
