@@ -1,9 +1,11 @@
 package tools.osgi.bundle;
 
 import aQute.bnd.osgi.Builder;
+import aQute.bnd.osgi.FileResource;
 import aQute.bnd.osgi.Jar;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,9 +24,28 @@ public class OsgiUtil {
             Builder builder = new Builder();
             builder.setJar(new Jar(new File(inputJar)));
 
-            toMap(instructionStr).forEach((k, v) -> builder.setProperty(k,v));
+            Map<String, String> instructionMap = toMap(instructionStr);
+            String embedDepStr = instructionMap.get("Embed-Dependency");
+            String bundleClassPath = ".", embeddedArtifacts="";
+
+            for(String embedSource: embedDepStr.split(",")) {
+                String[] data = embedSource.split(";");
+                String fileName = data[0];
+                bundleClassPath+=","+fileName;
+                embeddedArtifacts+=fileName+",";
+            }
+
+            instructionMap.put("Bundle-ClassPath", bundleClassPath);
+            instructionMap.put("Embedded-Artifacts", embeddedArtifacts);
+            instructionMap.put("Embed-Dependency", embeddedArtifacts);
+
+
+            instructionMap.forEach((k, v) -> builder.setProperty(k,v));
 
             Jar outJar = builder.build();
+
+            updateJarWithEmbededDependencies(embedDepStr, outJar);
+
             final File outFile = new File(outputJar);
             if(!outFile.exists()) {
                 outFile.getParentFile().mkdirs();
@@ -34,6 +55,16 @@ public class OsgiUtil {
             outJar.write(outFile);
         } catch (Exception e) {
             error("could not assemble osgi jar "+e.getLocalizedMessage());
+        }
+    }
+
+    private static void updateJarWithEmbededDependencies(String embedDepStr, Jar outJar) throws IOException {
+        for(String embedSource: embedDepStr.split(",")) {
+            String[] data = embedSource.split(";");
+
+            String fileName = data[0];
+            String filePath = data[1];
+            outJar.putResource(fileName, new FileResource(new File(filePath)));
         }
     }
 

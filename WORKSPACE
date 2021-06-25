@@ -2,8 +2,8 @@ workspace(name = "bazel-rules")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-RULES_JVM_EXTERNAL_TAG = "4.0"
-RULES_JVM_EXTERNAL_SHA = "31701ad93dbfe544d597dbe62c9a1fdd76d81d8a9150c2bf1ecf928ecdf97169"
+RULES_JVM_EXTERNAL_TAG = "4.1"
+RULES_JVM_EXTERNAL_SHA = "f36441aa876c4f6427bfb2d1f2d723b48e9d930b62662bf723ddfb8fc80f0140"
 
 http_archive(
     name = "rules_jvm_external",
@@ -20,12 +20,13 @@ maven_install(
        "com.google.guava:guava:28.0-jre",
        "biz.aQute.bnd:biz.aQute.bndlib:3.4.0",
        "org.apache.felix:org.apache.felix.scr.bnd:1.9.6",
-       "org.slf4j:slf4j-api:1.7.25",
+       "org.slf4j:slf4j-api:1.7.24",
+        "com.google.code.gson:gson:2.8.7",
+        "org.apache.commons:commons-lang3:3.12.0",
    ],
     version_conflict_policy = "pinned",
     fetch_sources = True,
     repositories = [
-        "http://www.maven.org/maven2",
-        "https://jcenter.bintray.com/",
-    ],
-   )
+        "https://repo1.maven.org/maven2",
+   ],
+)
